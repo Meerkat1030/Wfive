@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WFive</title>
+  <link rel="icon" href="icon.ico">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <!-- jquery UI 링크 -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="css/BasicCss.css">
+  <link rel="stylesheet" href="css/CRUDCss.css">
+  <!-- alert -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  <script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script>
+  <!-- /alert -->
+  <style>
+    /*마커 설명 표시 css*/
+    [data-tooltip-text]:hover {
+      position: relative;
+    }
+
+    [data-tooltip-text]:after {
+      -webkit-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+      -moz-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+      transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+
+      background-color: rgba(0, 0, 0, 0.69);
+
+      -webkit-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+      -moz-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+      box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+
+      color: #FFFFFF;
+      font-size: 15px;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      position: absolute;
+      width: auto;
+      min-width: 50px;
+      max-width: 300px;
+      word-wrap: break-word;
+
+      z-index: 9999;
+
+      opacity: 0;
+      left: -9999px;
+      top: 90%;
+
+      content: attr(data-tooltip-text);
+    }
+
+    [data-tooltip-text]:hover:after {
+      top: 130%;
+      left: 0;
+      opacity: 1;
+      white-space: pre;
+    }
+
+    .ui-datepicker-calendar>tbody td.ui-datepicker-week-end:first-child a {
+      color: red;
+    }
+
+    .ui-datepicker-calendar>tbody td.ui-datepicker-week-end:last-child a {
+      color: blue;
+    }
+
+    .ui-datepicker {
+      font-size: 15px;
+      z-index: 9999;
+    }
+
+    #myimage {
+      width: 200px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="wrap">
+    <div class="logo">
+      <img src="icon/logoY.png" onclick="main()" title="Main">
+    </div>
+    <div class="question">
+  <img src="icon/question.png" id="tutorials" onclick="tutorials()">
+</div>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <img src="tutoImg/Oupdate.png">
+  </div>
+</div>
+    <hr>
+    <section>
+      <div class="input-group mb-3">
+        <span data-tooltip-text="마커를 눌러 위치 찾기" class="contents-icon" onclick="searchaddr()"><img src="icon/pin.png"></span>
+        <input type="text" id="addr" class="form-addr" placeholder="Address 지도 마커를 눌러 위치 찾기">
+      </div>
+      <div class="input-group mb-3">
+        <input type="text" name="Title" id="title" class="form-title" placeholder="Title">
+        <input type="text" id="VDate" class="form-date" placeholder="Date">
+      </div>
+      <div class="input-group">
+        <textarea type="text" class="form-control" id="comment" name="Comment" required placeholder="Comment" style="height: 200px;"></textarea>
+      </div>
+      <div class="input-group mb-3">
+        <input type="text" id="hash" class="form-control" required placeholder="Hash Tag(최대 5개)       ex) #Diary #WFive " style="margin-top:1%" onkeyup="noSpace(this);" />
+      </div>
+
+      <div class="f-pct">
+        <input type="file" id="upImgFiles" onchange="uploadImgPreview(this, 'thumbnailImgs')">
+        <div id='thumbnailImgs'>
+        </div>
+        <div class="delete_img">
+          <img id="myimage" src=" ">
+        </div>
+      </div>
+
+      <div class="f-crt">
+        <div class="upload btn" id="upload">
+          <button type="button" class="btn btn-outline-secondary" name="upload">Upload</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+<!-- Firebase setting-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-app.js"></script>
+<!-- TODO: Add SDKs for Firebase products that you want to use
+   https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-analytics.js">
+  firebase.analytics();
+</script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-auth.js"></script><!-- firebase.auth()함수 에러 잡아주는 코드-->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-storage.js"></script>
+<script document.cookie="safeCookie1=foo; SameSite=Lax" ; document.cookie="safeCookie2=foo" ; document.cookie="crossCookie=bar; SameSite=None; Secure" ;></script>
+<script src="./js/fireinit.js"></script>
+<script src="./js/random.js"></script>
+<script src="./js/uploadImgPreview.js"></script>
+<!-- /Firebase setting-->
+
+<!-- datepicker -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script>
+  $(function() {
+    $("#VDate").datepicker({
+      monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+      dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+      showAnim: "slideDown",
+      showOtherMonths: true,
+      selectOtherMonths: true,
+      changeMonth: true,
+      changeYear: true,
+      showMonthAfterYear: true,
+      dateFormat: "yy-mm-dd",
+    });
+  });
+</script>
+<!-- /datepicker -->
+<script>
+  //DB저장
+  console.log("cu page 진입성공");
+  var firebaseDatabase; // firebaseDatabase 전역변수
+  //데이터베이스 모듈객체 가져오기
+  firebaseDatabase = firebase.database();
+  var title;
+  var comment;
+  var userInfo;
+  var auth;
+  var url; //사진이 저장될 url
+  var img;
+  var VDate;
+  var key;
+  var addr;
+  var hash;
+  var temp;
+  var tag = '';
+  var selectkey = location.href.substr(
+    location.href.lastIndexOf('=') + 1
+  );
+  console.log(selectkey);
+  auth = firebase.auth();
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      //인증성공부
+      console.log("success");
+      console.log(user);
+      //메모리스트 출력
+      userInfo = user; //로그인이 성공을 하면 user의 정보 즉, uid등을 이용하기 위해 userInfo에 저장
+      fn_update();
+    } else {
+      //인증실패부
+      auth.signInWithPopup(authProvider);
+    }
+  });
+
+  function fn_update() {
+    diaryRef = firebaseDatabase.ref("diary/" + userInfo.uid + '/' + selectkey)
+      .once('value').then(function(snapshot) {
+        console.log(snapshot.val());
+        var diary = snapshot.val();
+        title = diary.title;
+        comment = diary.comment;
+        originurl = diary.photo;
+        VDate = diary.visitDate;
+        CDate = diary.createtime;
+        addr = diary.address;
+        hash = diary.hashTag;
+        console.log(title + '/' + comment + '/' + originurl + '/' + VDate + '/' + CDate + '/' + addr + '/' + hash);
+        $("#CDate").val(CDate);
+        $("#VDate").val(VDate);
+        $("#addr").val(addr);
+        document.querySelector('#myimage').src = originurl;
+        $("#title").val(title);
+        $("#comment").val(comment);
+        $("#hash").val(hash);
+      });
+  }
+
+  Date.prototype.format = function(f) {
+    if (!this.valueOf()) return " ";
+    var weekKorName = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+    var weekKorShortName = ["일", "월", "화", "수", "목", "금", "토"];
+    var weekEngName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    var weekEngShortName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var d = this;
+    return f.replace(/(yyyy|yy|MM|dd|KS|KL|ES|EL|HH|hh|mm|ss|a\/p)/gi, function($1) {
+      switch ($1) {
+        case "yyyy":
+          return d.getFullYear(); // 년 (4자리)
+        case "yy":
+          return (d.getFullYear() % 1000).zf(2); // 년 (2자리)
+        case "MM":
+          return (d.getMonth() + 1).zf(2); // 월 (2자리)
+        case "dd":
+          return d.getDate().zf(2); // 일 (2자리)
+        case "KS":
+          return weekKorShortName[d.getDay()]; // 요일 (짧은 한글)
+        case "KL":
+          return weekKorName[d.getDay()]; // 요일 (긴 한글)
+        case "ES":
+          return weekEngShortName[d.getDay()]; // 요일 (짧은 영어)
+        case "EL":
+          return weekEngName[d.getDay()]; // 요일 (긴 영어)
+        case "HH":
+          return d.getHours().zf(2); // 시간 (24시간 기준, 2자리)
+        case "hh":
+          return ((h = d.getHours() % 12) ? h : 12).zf(2); // 시간 (12시간 기준, 2자리)
+        case "mm":
+          return d.getMinutes().zf(2); // 분 (2자리)
+        case "ss":
+          return d.getSeconds().zf(2); // 초 (2자리)
+        case "a/p":
+          return d.getHours() < 12 ? "오전" : "오후"; // 오전/오후 구분
+        default:
+          return $1;
+      }
+    });
+  };
+  String.prototype.string = function(len) {
+    var s = '',
+      i = 0;
+    while (i++ < len) {
+      s += this;
+    }
+    return s;
+  };
+  String.prototype.zf = function(len) {
+    return "0".string(len - this.length) + this;
+  };
+  Number.prototype.zf = function(len) {
+    return this.toString().zf(len);
+  };
+
+  var today = new Date(); // 시간 변수 계속 바뀜
+  function userSessionCheck() {
+    console.log(today.format('yyyy-MM-dd(KS) HH:mm:ss'));
+  }
+  userSessionCheck();
+  $(document).ready(function() {
+    $('#upImgFiles').click(function() {
+      $('div.delete_img').remove();
+    })
+    console.log("cu page 진입성공2");
+    //CU화면 upload버튼 눌렀을 때
+    $(document).on('click', '.upload', function() {
+      //내가 쓴글 가져오기 - jquery방식으로 가져왔다.
+      title = $('#title').val();
+      comment = $('#comment').val();
+      url = $('#upImgFiles').val();
+      VDate = $('#VDate').val();
+      addr = $('#addr').val();
+      hash = $('#hash').val();
+
+      //비어 있는 항목이 있다면 저장 불가능하게
+      if (addr === '') {
+        Swal.fire({
+          position: 'top',
+          icon: 'error',
+          title: '주소를 찾아주세요.',
+        });
+        return;
+      }
+      else if (title === '') {
+        Swal.fire({
+          position: 'top',
+          icon: 'error',
+          title: '제목을 입력해주세요.',
+        });
+        return;
+      }
+      else if (VDate === '') {
+        Swal.fire({
+          position: 'top',
+          icon: 'error',
+          title: '방문 날짜를 입력해주세요.',
+        });
+        return;
+      }
+      else if (comment === '') {
+        Swal.fire({
+          position: 'top',
+          icon: 'error',
+          title: '내용을 입력해주세요.',
+        });
+        return;
+      }
+      if (url === '') {
+        diaryRef = firebaseDatabase.ref("diary/" + userInfo.uid + '/' + selectkey);
+        if (hash === '') {
+          tag = '';
+        } else {
+          temp = hash.split('#'); //해쉬태그 앞에 5개만 들어가도록 자르는 부분
+          if (temp.length < 6) {
+            tag = hash;
+          } else {
+            for (var i = 1; i < 6; i++) {
+              console.log('#' + temp[i] + ', ');
+              tag += '#' + temp[i];
+            }
+          }
+        }
+        diaryRef.update({
+          title: title,
+          comment: comment,
+          photo: originurl,
+          createtime: CDate,
+          visitDate: VDate,
+          address: addr,
+          hashTag: tag,
+          updatetime: today.format('yyyy-MM-dd(KS) HH:mm:ss')
+        });
+          Swal.fire({
+            position: 'center',
+            icon : 'success',
+            title : '수정이 완료되었습니다.',
+          }).then((href) => {
+            if(href){
+              window.location.href = "RD.html?key=" + selectkey;
+            }
+          });
+      }
+      saveDiary();
+    });
+  });
+
+  function saveDiary() {
+    var fileButton = document.getElementById("upImgFiles");
+    var ran = result;
+    if (fileButton) {
+      var file = fileButton.files[0];
+      // Create the file metadata
+      var metadata = {
+        contentType: 'image/jpeg'
+      };
+      var storageRef = firebase.storage().ref();
+      // Upload file and metadata to the object 'images/mountains.jpg'
+      var uploadTask = storageRef.child('images/' + userInfo.uid + ran).put(file, metadata);
+      // Listen for state changes, errors, and completion of the upload.
+      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+        function(snapshot) { //snapshot함수
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log('Upload is ' + progress + '% done');
+          switch (snapshot.state) {
+            case firebase.storage.TaskState.PAUSED: // or 'paused'
+              console.log('Upload is paused');
+              break;
+            case firebase.storage.TaskState.RUNNING: // or 'running'
+              console.log('Upload is running');
+              break;
+          }
+        },
+        function(error) { //사진업로드에 에러가 생기면
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          switch (error.code) {
+            case 'storage/object-not-found':
+              // File doesn't exist
+              console.log("File doesn't exist");
+              break;
+            case 'storage/unauthorized':
+              // User doesn't have permission to access the object
+              console.log("User doesn't have permission to access the object");
+              break;
+            case 'storage/canceled':
+              // User canceled the upload
+              console.log("User canceled the upload");
+              break;
+            case 'storage/unknown':
+              // Unknown error occurred, inspect the server response
+              console.log("Unknown error occurred, inspect the server response");
+              break;
+            default:
+              console.log("other error");
+          }
+        },
+        function() { //사진업로드가 성공하면 실행되는 함수
+          // Upload completed successfully, now we can get the download URL
+          uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+            console.log('File available at', downloadURL);
+            diaryRef = firebaseDatabase.ref("diary/" + userInfo.uid + '/' + selectkey);
+            if (hash === '') {
+              tag = '해쉬테그 없음';
+            } else {
+              temp = hash.split('#'); //해쉬태그 앞에 5개만 들어가도록 자르는 부분
+              if (temp.length < 6) {
+                tag = hash;
+              } else {
+                for (var i = 1; i < 6; i++) {
+                  console.log('#' + temp[i] + ', ');
+                  tag += '#' + temp[i];
+                }
+              }
+            }
+            // tag = tag.replace(/,(\s+)?$/, '');
+            diaryRef.update({
+              title: title,
+              comment: comment,
+              photo: downloadURL,
+              createtime: CDate,
+              visitDate: VDate,
+              address: addr,
+              hashTag: tag,
+              updatetime: today.format('yyyy-MM-dd(KS) HH:mm:ss')
+            });
+          });
+        });
+        setTimeout(function() {
+          finish();
+        }, 2000);
+      $('#VDate').val("");
+      $('#title').val("");
+      $('#comment').val("");
+      $('#upImgFiles').val("");
+      $('#thumbnailImgs').val("");
+      $('#addr').val("");
+      $('#hash').val("");
+    }
+    return true;
+  }
+  function finish(){
+    Swal.fire({
+      position: 'center',
+      icon : 'success',
+      title : '수정이 완료되었습니다.',
+    }).then((href) => {
+      if(href){
+        window.location.href = "RD.html?key=" + selectkey;
+      }
+    });
+  }
+</script>
+<script>
+  //로고 클릭시 메인화면으로
+  function main() {
+    Swal.fire({
+      position: 'top',
+      icon : 'warning',
+      title : '메인 화면으로 돌아가시겠습니까? \n일기는 저장되지않습니다.',
+      showCancelButton: true,
+      cancelButtonColor: '#d33',
+    }).then((href) => {
+      if(href.value){
+         window.location.href = "Main.html";
+      }else{
+        return;
+      }
+    });
+  }
+  function noSpace(obj) { //해쉬테그칸에 공백금지 함수
+    var a = $('#hash').val().replace(/ /gi, '');
+    $('#hash').val(a);
+  }
+</script>
+<script>
+  // 지도 아이콘 클릭시 주소찾기 창
+  function searchaddr() {
+    window.open("searchaddr.html", "a", "width=1600, height=850, left=100, top=50");
+  }
+</script>
+<script>
+  function tutorials() {
+    var modal = document.getElementById('myModal');
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("tutorials");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on the button, open the modal
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  };
+</script>
+<!--부트스트랩 src -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+</html>

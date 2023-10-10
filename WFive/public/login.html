@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+  <meta charset="utf-8">
+  <title>WFive</title>
+  <link rel="icon" href="icon.ico">
+  <!-- 아이콘 -->
+
+</head>
+
+<style>
+  body {
+    background-image: url('icon/지도샘플.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  div {
+    text-align: center;
+  }
+
+  .Question {
+    margin-top: 220px;
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+  }
+
+  #customBtn {
+    display: inline-block;
+    background: white;
+    color: #444;
+    width: 210px;
+    border-radius: 5px;
+    border: thin solid #888;
+    box-shadow: 1px 1px 1px grey;
+    white-space: nowrap;
+    margin-top: 20px;
+  }
+
+  #customBtn:hover {
+    cursor: pointer;
+  }
+
+  span.label {
+    font-family: serif;
+    font-weight: normal;
+  }
+
+  span.icon {
+    background: url('icon/icons8-google-40.png') transparent 5px 50% no-repeat;
+    display: inline-block;
+    vertical-align: middle;
+    width: 43px;
+    height: 42px;
+  }
+
+  span.buttonText {
+    display: inline-block;
+    vertical-align: middle;
+    padding-left: 42px;
+    padding-right: 42px;
+    font-size: 16px;
+    font-weight: bold;
+    /* Use the Roboto font that is loaded in the <head> */
+    font-family: 'Roboto', sans-serif;
+  }
+
+  /* modal*/
+  .modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 9999;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+  }
+
+  /* Modal Content/Box */
+  .modal-content {
+    /* background-color: #fefefe; */
+    margin: 2% auto;
+    /* 15% from the top and centered */
+    padding: 15px;
+    /* border: 1px solid #888; */
+    width: 90%;
+    /* Could be more or less, depending on screen size */
+  }
+
+  /* The Close Button */
+  .close {
+    color: #414141;
+    position: absolute;
+    right: 1%;
+    top: -1%;
+    font-size: 60px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+</style>
+
+<body style="background-image">
+  <div>
+    <img src="icon/logoY.png" alt="logo" style="width: 650px; margin-top: -50px;"></img>
+  </div>
+  <div>
+    <img src="icon/user.png" alt="" style="width: 250px; margin-top:-70px;"></img>
+    <div class="card">
+      <!-- <div class="card-content">
+        로그인상태 :
+        <!-- TODO 상태 보기용 span추가-->
+      <!-- <span id="AUTH_STATE" class="blue-text">(인증되지 않음)</span>
+      </div> -->
+      <div class="card-action">
+        <!-- TODO 로그인 버튼 -->
+        <div id="customBtn">
+          <span class="icon"></span>
+          <span class="buttonText">Google</span>
+        </div>
+        <!-- TODO 로그아웃 버튼-->
+        <!-- TODO 유저 정보 확인용 요소 추가-->
+      </div>
+    </div>
+  </div>
+  <div class="Question">
+    <img src="icon/question.png" style="width: 50px; cursor: pointer;" onclick="tutorials()"></img>
+  </div>
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="slide">
+        <ul>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</body>
+<!-- JS start -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<!-- firebase SDK 링크 -->
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.14.1/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-database.js"></script>
+<script src="js/fireinit.js"></script> <!-- firebase config를 fireinit에 따로 빼둠-->
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+   https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-analytics.js">
+  firebase.analytics();
+</script>
+<script type="text/javascript">
+  /* 버튼 누르면 구글 인증 동작*/
+  $("#customBtn").click(function() {
+    /*구글 인증을 provider 변수에 대체*/
+    var provider = new firebase.auth.GoogleAuthProvider();
+    /*provider(구글인증) 인증으로 로그인 처리*/
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+
+      window.location.href = "Main.html"
+      //구글 로그인이 성공했다면
+      $('#AUTH_STATE').text(result.user.displayName + "님 로그인 하셨습니다.");
+    }).catch(function(error) { //로그인 실패??
+      // 로그인이 실패했다면 실행
+      alert(error.message)
+    });
+  });
+</script>
+<script>
+  function tutorials() {
+    window.location.href="tutorials.html";
+  }
+</script>
+</html>

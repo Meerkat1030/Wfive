@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>WFive</title>
+  <link rel="icon" href="icon.ico">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="css/BasicCss.css">
+  <link rel="stylesheet" href="css/SearchCss.css">
+  <!-- alert -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  <script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script>
+  <!-- /alert -->
+
+  <style>
+    /*마커 설명 표시 css*/
+    [data-tooltip-text]:hover {
+      position: relative;
+    }
+
+    [data-tooltip-text]:after {
+      -webkit-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+      -moz-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+      transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+
+      background-color: rgba(0, 0, 0, 0.69);
+
+      -webkit-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+      -moz-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+      box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+
+      color: #FFFFFF;
+      font-size: 15px;
+      margin-bottom: 10px;
+      margin-left: 90%;
+      padding: 7px 12px;
+      position: absolute;
+      width: auto;
+      min-width: 50px;
+      max-width: 300px;
+      word-wrap: break-word;
+
+      z-index: 9999;
+
+      opacity: 0;
+      left: -9999px;
+      top: 90%;
+
+      content: attr(data-tooltip-text);
+    }
+
+    [data-tooltip-text]:hover:after {
+      top: 100%;
+      left: 0;
+      opacity: 1;
+      white-space: pre;
+    }
+
+    .ui-datepicker-calendar>tbody td.ui-datepicker-week-end:first-child a {
+      color: red;
+    }
+
+    .ui-datepicker-calendar>tbody td.ui-datepicker-week-end:last-child a {
+      color: blue;
+    }
+
+    .ui-datepicker {
+      font-size: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="wrap">
+    <div class="logo">
+      <img src="icon/logoY.png" onclick="location.href='Main.html'" title="Main">
+    </div>
+    <div class="searchPlace">
+      <input type="text" id="input" class="search" autofocus required placeholder="검색어 입력" />
+      <div class="sb">
+        <input type="image" id="datepicker" src="icon/calendar.png" style="width:30px;height:30px;border:0px;outline: none;" />
+        <input type="checkbox" id="hash" src="icon/hash.png" data-tooltip-text="HashTag로 검색하기" onclick="plushash()" style="width:25px;height:25px;border:0px;outline: none; cursor:pointer;" />
+      </div>
+      <div class="shh">
+        <input type="image" src="icon/search.png" onclick="go_search()" style="width:30px;height:30px;border:0px;outline: none;" />
+      </div>
+    </div>
+    <div class="question">
+      <img src="icon/question.png" id="tutorials" onclick="tutorials()">
+    </div>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <img src="tutoImg/Osearch.png">
+      </div>
+    </div>
+    <hr>
+    <div class="cnt">
+    </div>
+    <div id="searchList">
+    </div>
+    <div class="set">
+      <img src="icon/return.png" onclick="location.href='Main.html'" style="width:30px;height:29px; outline:none;" />
+    </div>
+  </div>
+
+</body>
+<!-- Firebase setting-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-app.js"></script>
+<!-- TODO: Add SDKs for Firebase products that you want to use
+   https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-analytics.js">
+  firebase.analytics();
+</script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-auth.js"></script><!-- firebase.auth()함수 에러 잡아주는 코드-->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-storage.js"></script>
+<script document.cookie="safeCookie1=foo; SameSite=Lax" ; document.cookie="safeCookie2=foo" ; document.cookie="crossCookie=bar; SameSite=None; Secure" ;></script>
+<script src="./js/fireinit.js"></script>
+<script src="./js/random.js"></script>
+<script src="./js/uploadImgPreview.js"></script>
+<!-- /Firebase setting-->
+
+<!-- datepicker -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script>
+  $(function() {
+    $("#datepicker").datepicker({
+      monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+      dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+      showAnim: "slideDown",
+      showOtherMonths: true,
+      selectOtherMonths: true,
+      changeMonth: true,
+      changeYear: true,
+      showMonthAfterYear: true,
+      dateFormat: "yy-mm-dd",
+      onSelect: function(date) {
+        go_keyword(date);
+      },
+    });
+
+  });
+</script>
+<!-- /datepicker -->
+<script>
+  var database = firebase.database();
+  var addrarray = [];
+  var auth, userInfo, diaryData, key, selectkey, keyword, total, lastNo,
+    cnt = 0,
+    searchurl;
+  var title, comment, url, VDate, addr, CDate, hash, UDate, tag = '',
+    postNo,
+    auth = firebase.auth();
+  String.prototype.replaceAll = function(org, dest) {
+    return this.split(org).join(dest);
+  }
+  var enc = location.href;
+  var dec = decodeURI(enc);
+  var keyword = dec.substr(dec.lastIndexOf('=') + 1);
+  keyword = keyword.replaceAll("*", "#");
+
+  console.log('keyword : ' + keyword);
+  console.log(keyword[0]);
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      //인증성공부
+      console.log("success");
+      console.log(user);
+      //메모리스트 출력
+      userInfo = user; //로그인이 성공을 하면 user의 정보 즉, uid등을 이용하기 위해 userInfo에 저장
+      console.log(userInfo.uid);
+      get_diary_list();
+    } else {
+      //인증실패부
+      auth.signInWithPopup(authProvider);
+    }
+  });
+</script>
+<script>
+  function get_diary_list() {
+    console.log(userInfo.uid);
+    var diaryRef = database.ref("diary/" + userInfo.uid);
+
+    diaryRef.on("child_added", (ds) => {
+      on_child_added(ds)
+    });
+    setTimeout(function() {
+      fn_cnt_post();
+    }, 2000);
+    diaryRef.on('child_changed', function(data) {
+      console.log(data.key); //어떤게 수정되었는지 찍고
+      console.log(data.val()); //어떻게 수정되었는지 띄움
+      fn_f5();
+    });
+  }
+
+  function fn_cnt_post() {
+    console.log("fn_cnt_post 진입완료");
+    if (postNo === undefined) {
+      console.log("검색결과 없음");
+      var html2 =
+        "<span style=\"color:rgb(255, 71, 38);\"> '" + keyword + "'</span> <span>에 대한 검색 결과 :  없음</span>";
+      $(".cnt").append(html2);
+    } else {
+      var html2 =
+        "<span style=\"color:rgb(255, 71, 38);\"> '" + keyword + "'</span> <span>에 대한 검색 결과 :  <span id=\"cnt\">'" + postNo + "'건</span></span>";
+      $(".cnt").append(html2);
+    }
+
+  }
+
+  function on_child_added(data) {
+    key = data.key;
+    diaryData = data.val();
+    VDate = diaryData.visitDate;
+    // cnt = cnt + 1;
+    title = diaryData.title;
+    comment = diaryData.comment;
+    url = diaryData.photo;
+    hash = diaryData.hashTag;
+    addr = diaryData.address;
+    CDate = diaryData.createtime;
+    UDate = diaryData.updatetime;
+
+    if (hash === "") {
+      console.log("해쉬태그가 없는 글입니다.");
+      hash = "해쉬태그 없음";
+    }
+    if (keyword === "@ALL POSTING") {
+      fn_all_post(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    } else if (keyword[0] === "#") {
+      fn_hash_post(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    } else {
+      fn_other_compare(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    }
+  }
+
+  function fn_hash_post(key, addr, comment, CDate, hash, url, title, UDate, VDate) {
+    console.log("fn_hash_post진입");
+    if (hash.match(keyword)) {
+      console.log("이글이다!!!!!!");
+      cnt += 1;
+      postNo = cnt;
+      var html =
+        "<div class=\"SearchResult\" id='" + key + "'data-tooltip-text=\"자세히 보기\" onclick=\"go_RD2(this.id)\">" +
+        "<h5 id=\"diaryCnt\" style=\"margin:1% 0 0 1%;\">" + postNo + "</h5>" +
+        "<div id=\'thumbnailImgs\'src=' ' \>" +
+        "<img id=\"myimage\" src='" + url + "' style=\"float:left; width: 150px; max-width: 160px; height:185px; margin-top:-2.5%; margin-left: 3.5%;\">" +
+        "</div>" +
+        "<div class=\"float\">" +
+        "<span class=\"input-group-prepend\">" +
+        "<span class=\"input-group-text\">Write Date</span>" +
+        "<span class=\"form-date\" id=\"CDate\">" + CDate + "</span>" +
+        "<span class=\"input-group-text\">Visit Date</span>" +
+        "<span class=\"form-date\" id=\"VDate\">" + VDate + "</span>" +
+        "</span>" +
+        "<span id= \"title\" class=\"form-title\">" + title.substr(0, 35) + "</span>" +
+        "<span class=\"form-hash\" id=\"hash\">" + hash + "</span>" +
+        "<span id=\"comment\" class=\"form-comment\">" + comment.substr(0, 40) + "</span>" +
+        "<span class=\"form-addr\" id=\"addr\">" + addr + "</span>" +
+        "</div>" +
+        "</div>";
+      $("#searchList").append(html);
+    }
+  }
+
+  function fn_other_compare(key, addr, comment, CDate, hash, url, title, UDate, VDate) {
+    console.log("fn_other_compare진입");
+    if (addr.match(keyword)) {
+      fn_other_post(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    } else if (comment.match(keyword)) {
+      fn_other_post(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    } else if (CDate.match(keyword)) {
+      fn_other_post(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    } else if (title.match(keyword)) {
+      fn_other_post(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    } else if (UDate.match(keyword)) {
+      fn_other_post(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    } else if (VDate.match(keyword)) {
+      fn_other_post(key, addr, comment, CDate, hash, url, title, UDate, VDate);
+    }
+  }
+
+  function fn_other_post(key, addr, comment, CDate, hash, url, title, UDate, VDate) {
+    console.log("fn_other_post진입");
+    cnt += 1;
+    postNo = cnt;
+    var html =
+      "<div class=\"SearchResult\" id='" + key + "'data-tooltip-text=\"자세히 보기\" onclick=\"go_RD2(this.id)\">" +
+      "<h5 id=\"diaryCnt\" style=\"margin:1% 0 0 1%;\">" + postNo + "</h5>" +
+      "<div id=\'thumbnailImgs\'src=' '>" +
+      "<img id=\"myimage\" src='" + url + "' style =\"float:left;width: 150px;max-width: 160px;height:185px;margin-top:-2.5%;margin-left: 3.5%;\">" +
+      "</div>" +
+      "<div class=\"float\">" +
+      "<span class=\"input-group-prepend\">" +
+      "<span class=\"input-group-text\">Write Date</span>" +
+      "<span class=\"form-date\" id=\"CDate\">" + CDate + "</span>" +
+      "<span class=\"input-group-text\">Visit Date</span>" +
+      "<span class=\"form-date\" id=\"VDate\">" + VDate + "</span>" +
+      "</span>" +
+      "<span id= \"title\" class=\"form-title\">" + title.substr(0, 35) + "</span>" +
+      "<span class=\"form-hash\" id=\"hash\">" + hash + "</span>" +
+      "<span id=\"comment\" class=\"form-comment\">" + comment.substr(0, 40) + "</span>" +
+      "<span class=\"form-addr\" id=\"addr\">" + addr + "</span>" +
+      "</div>" +
+      "</div>";
+    $("#searchList").append(html);
+
+  }
+
+  function fn_all_post(key, addr, comment, CDate, hash, url, title, UDate, VDate) {
+    console.log("fn_other_post진입");
+    cnt += 1;
+    postNo = cnt;
+    var html =
+      "<div class=\"SearchResult\" id='" + key + "'data-tooltip-text=\"자세히 보기\" onclick=\"go_RD2(this.id)\">" +
+      "<h5 id=\"diaryCnt\" style=\"margin:1% 0 0 1%;\">" + postNo + "</h5>" +
+      "<div id=\'thumbnailImgs\' src=' '>" +
+      "<img id=\"myimage\" src='" + url + "' style =\"float:left;width: 150px;max-width: 160px;height:185px;margin-top:-2.5%;margin-left: 3.5%;\">" +
+      "</div>" +
+      "<div class=\"float\">" +
+      "<span class=\"input-group-prepend\">" +
+      "<span class=\"input-group-text\">Write Date</span>" +
+      "<span class=\"form-date\" id=\"CDate\">" + CDate + "</span>" +
+      "<span class=\"input-group-text\">Visit Date</span>" +
+      "<span class=\"form-date\" id=\"VDate\">" + VDate + "</span>" +
+      "</span>" +
+      "<span id= \"title\" class=\"form-title\">" + title.substr(0, 35) + "</span>" +
+      "<span class=\"form-hash\" id=\"hash\">" + hash + "</span>" +
+      "<span id=\"comment\" class=\"form-comment\">" + comment.substr(0, 40) + "</span>" +
+      "<span class=\"form-addr\" id=\"addr\">" + addr + "</span>" +
+      "</div>" +
+      "</div>";
+    $("#searchList").append(html);
+  }
+
+  function plushash() { //해쉬테그칸에 공백금지 함수
+    var chk2 = $("#hash").is(":checked");
+    if (chk2) {
+      $("#input").focus();
+      $("#input").val("#");
+      $(document).on('keyup', "#input", function() {
+        var a = $("#input").val().replace(/ /gi, '');
+        $("#input").val(a);
+      });
+    } else {
+      location.reload();
+      $("#input").val("");
+    }
+  }
+
+  function go_search() {
+    var searchword = $("#input").val();
+
+    if (searchword === '') {
+      swal.fire({
+        icon: 'error',
+        title: '검색어를 입력해 주세요.',
+        position: 'top',
+      })
+      return;
+    } else if (searchword === '#') {
+      swal.fire({
+        icon: 'error',
+        title: '해쉬태그를 입력해 주세요.',
+        position: 'top',
+      })
+      return;
+    } else {
+      if (searchword[0] === '#') {
+        temp = searchword.split('#');
+        if (temp.length < 3) {
+          history.go(0);
+          console.log(searchword);
+          searchword = searchword.replaceAll("#", "*");
+          searchurl = "Search.html?searchword=" + searchword;
+          var enc = encodeURI(searchurl);
+          window.location.href = enc;
+        } else {
+          swal.fire({
+            position: 'top',
+            icon: 'warning',
+            title: '해쉬태그는 최대 1개까지 \n검색어로 지정할 수 있습니다.',
+          });
+        }
+      } else {
+        history.go(0);
+        console.log(searchword);
+        searchword = searchword.replaceAll("#", "*");
+        searchurl = "Search.html?searchword=" + searchword;
+        var enc = encodeURI(searchurl);
+        window.location.href = enc;
+      }
+
+    }
+  }
+
+  function go_keyword(keyword) {
+    $("#input").val(keyword);
+    console.log(keyword);
+  }
+
+  function go_RD2(key) { // RD2페이지로
+    window.open("Popup_RD.html?key=" + key, "a", "width=1380, height=1076, left=200, top=50");
+  }
+
+  function fn_f5() {
+    window.location.reload();
+  }
+</script>
+<script>
+  function tutorials() {
+    var modal = document.getElementById('myModal');
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("tutorials");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on the button, open the modal
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  };
+</script>
+<!--부트스트랩 src -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA32MglYzQs7W6f88lVgpGJwxfvLCTs-GQ"></script>
+
+</html>

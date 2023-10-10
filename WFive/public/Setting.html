@@ -1,0 +1,195 @@
+<!DOCTYPE html> <!-- 설정 창 화면(2)-->
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>setting page_2</title>
+    <link rel="icon" href="icon.ico">
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+  <!-- 아이콘 -->
+    <style>
+        #wrap {width: 100%; height: 100%; font-size: 40px; color: #fff; text-align: center;}
+        #side {float: left; width: 20%; height: 700px; background: #8C8C8C;}
+        #contents {float: right; width: 80%; height: 700px; background: #BDBDBD;}
+
+        div.yellow_logo{
+          display: initial;
+          position: absolute;
+          top: -50px;
+          left: -25px;
+        }
+
+        div.set{
+          display: initial;
+          position: absolute;
+          top: 80px;
+          left: 115px;
+          font-size: 25px;
+        }
+
+        div.fot{
+          display: initial;
+          position: absolute;
+          top: 150px;
+          left: 50px;
+          font-size: 25px;
+        }
+
+        div.fts{
+          display: initial;
+          position: absolute;
+          top: 210px;
+          left: 50px;
+          font-size: 25px;
+        }
+
+        div.the{
+          display: initial;
+          position: absolute;
+          top: 370px;
+          left: 50px;
+          font-size: 25px;
+        }
+
+        div.ths{
+          display: initial;
+          position: absolute;
+          top: 430px;
+          left: 50px;
+          font-size: 25px;
+        }
+
+        div.f_ret{
+          display: initial;
+          position: absolute;
+          top: 655px;
+          left: 15px;
+        }
+
+        div.f-sv{
+          display: initial;
+          position: absolute;
+          top: 645px;
+          left: 225px;
+        }
+
+        div.sh{
+            height: 35px;
+            width: 700px;
+            border: 2px solid #8C8C8C;
+            background: #ffffff;
+            display: initial;
+            position: absolute;
+            top: 20px;
+            left: 790px;
+        }
+
+        div.stt{
+            display: initial;
+            position: absolute;
+            top: -20px;
+            left: 2px;
+        }
+
+        div.sb{
+        display: initial;
+        position: absolute;
+        top: -10px;
+        left: 660px;
+        }
+
+        div.f-nw{
+          display: initial;
+          position: absolute;
+          top: 630px;
+          left: 1400px;
+        }
+
+    </style>
+
+<!-- 웹 폰트 -->
+
+</head>
+<body>
+
+  <!-- //footer 아이콘-->
+    <div id="wrap">
+      <div id="side">
+
+        <div class="yellow_logo"><img src="icon/외주- WF로고 시안 최종_대지 1 사본.png" width="250" height="180" align="left"; alt="로고"></div>
+
+        <div class="set">
+          <p>Setting
+          </p>
+        </div>
+
+        <div class="fot">
+          <p>Font
+          </p>
+        </div>
+
+        <div class="fts">
+          <select name="fonts" style="width:100px;height:30px;">
+            <option value="yellow">노랑</option>
+            <option value="pink">분홍</option>
+            <option value="purple">보라</option>
+            <option value="blue">파랑</option>
+            <option value="grin">초록</option>
+            <option value="orange">주황</option>
+            <option value="red">빨강</option>
+          </select>
+          </div>
+
+        <div class="the">
+          <p>Theme
+          </p>
+        </div>
+
+        <div class="ths">
+          <select name="themes" style="width:100px;height:30px;">
+            <option value="yellow">노랑</option>
+            <option value="pink">분홍</option>
+            <option value="purple">보라</option>
+            <option value="blue">파랑</option>
+            <option value="grin">초록</option>
+            <option value="orange">주황</option>
+            <option value="red">빨강</option>
+          </select>
+          </div>
+
+          <div class="f_ret">
+            <form action="/.html" accept-charset="utf-8" name="form_return" method="post">
+            <input type="image" src="icon/return.png" alt="뒤로 버튼" style="width:30px;height:30px;"/>
+            </form>
+          </div>
+
+          <div class="f-sv">
+            <form action="/.html" accept-charset="utf-8" name="form_save" method="post">
+            <input type="button" value="Save" style="width:60px;height:30px;margin:15px;"/>
+            </form>
+          </div>
+
+        </div>
+
+      <div id="contents">
+
+            <div class="sh">
+                <div class="stt">
+                <input type= "text" required placeholder= "검색어 입력" style="width:685px;height:20px;font-size:16px;text-align:left;
+padding:6px;border:0px;outline:none;"/>
+                </div>
+                <div class="sb">
+                  <form action="/.html" accept-charset="utf-8" name="form_search" method="post">
+                  <input type="image" src="icon/검색.png" alt="검색 버튼" style="width:30px;height:30px;border:0px;outline: none;"/>
+                  </form>
+                  </div>
+                </div>
+
+            <div class="f-nw">
+              <form action="/.html" accept-charset="utf-8" name="form_new" method="post">
+              <input type="button" value="New" style="width:60px;height:30px;margin:15px;"/>
+              </form>
+            </div>
+
+          </div>
+</body>
+</html>

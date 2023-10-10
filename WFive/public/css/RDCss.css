@@ -1,0 +1,129 @@
+.contents-icon {
+  margin-top: 0.2%;
+  margin-right: 1%;
+  width: 25px;
+  height: 25px;
+}
+
+.contents-icon img {
+  width: 100%;
+  height: 100%;
+}
+
+.form-comment {
+  display: block;
+  width: 98.9%;
+  height: 160px;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fafafa;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  margin-left: 1%;
+}
+
+.form-addr {
+  display: block;
+  width: 96.9%;
+  height: calc(1.5em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fafafa;
+  background-clip: padding-box;
+  border: 1px solid;
+  border-color: #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.form-title {
+  display: block;
+  width: 98.9%;
+  height: calc(1.5em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fafafa;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  margin: 1.5% 0 1% 1%;
+}
+
+.form-date {
+  display: block;
+  width: auto;
+  height: calc(1.5em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fafafa;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  margin: 0 1%;
+}
+.form-hash {
+  float:right;
+  width: auto;
+  max-width: 53%;
+  height: calc(1.5em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fafafa;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  margin-top : -4.5%;
+}
+
+.f-pct {
+  margin-top: 30px;
+}
+
+.f-crt {
+  float: right;
+  margin-top: -1%;
+  margin-right: -2.5%;
+  width: 30%;
+}
+
+.f-cr {
+  float: right;
+  margin-top: 2%;
+  margin-right: -29.5%;
+  width: 15%;
+}
+.f-cr img{
+  width: 35px;
+  height: 35px;
+}
+
+#thumbnailImgs {
+  margin-top: 20px;
+  float: left;
+
+}
+
+#thumbnailImgs img {
+  width: 200px;
+  height: auto;
+}

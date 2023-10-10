@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WFive</title>
+  <link rel="icon" href="icon.ico">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="css/BasicCss.css">
+  <link rel="stylesheet" href="css/Main.css">
+  <link rel="stylesheet" type="text/css" href="css/component.css" />
+  <script src="js/modernizr.custom.js"></script>
+  <!-- alert -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  <!-- Optional: include a polyfill for ES6 Promises for IE11 -->
+  <script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script>
+  <!-- /alert -->
+  <style>
+    [data-tooltip-text]:hover {
+      position: relative;
+    }
+
+    [data-tooltip-text]:after {
+      -webkit-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+      -moz-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+      transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+
+      background-color: rgba(0, 0, 0, 0.69);
+
+      -webkit-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+      -moz-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+      box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+
+      color: #FFFFFF;
+      font-size: 15px;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      position: absolute;
+      width: auto;
+      min-width: 50px;
+      max-width: 300px;
+      word-wrap: break-word;
+
+      z-index: 9999;
+
+      opacity: 0;
+      left: -9999px;
+      top: 90%;
+
+      content: attr(data-tooltip-text);
+    }
+
+    [data-tooltip-text]:hover:after {
+      top: 130%;
+      left: 0;
+      opacity: 1;
+      white-space: pre;
+    }
+
+    #map {
+      border: 1px solid #cdcdcd;
+      width: calc(100% - 250px);
+      height: 42rem;
+      float: right;
+      margin-top: -1rem;
+    }
+
+    .ui-datepicker {
+      margin-top: 8px;
+      font-size: 15px;
+    }
+
+    .ui-datepicker-trigger {
+      width: 30px;
+      height: 30px;
+      float: left;
+      margin-right: 7px;
+    }
+
+    .ui-datepicker-month {
+      margin-top: 5%;
+    }
+
+    .ui-datepicker-calendar>tbody td.ui-datepicker-week-end:first-child a {
+      color: red;
+    }
+
+    .ui-datepicker-calendar>tbody td.ui-datepicker-week-end:last-child a {
+      color: blue;
+    }
+
+    .form-control {
+      margin-top: 5%;
+    }
+
+    #hash {
+      cursor: pointer;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="wrap">
+    <div class="logo">
+      <img src="icon/logoY.png" id="logo" onclick="window.location.reload()" title="Main">
+    </div>
+    <div class="searchPlace">
+      <input type="text" class="search" id="input" autofocus required placeholder="검색어 입력" />
+      <div class="sb">
+        <input type="image" id="datepicker" src="icon/calendar.png" style="width:30px;height:30px;border:0px;outline: none;" />
+        <input type="checkbox" id="hash" src="icon/hash.png" data-tooltip-text="HashTag로 검색하기" onclick="plushash()" style="width:25px;height:25px;border:0px;outline: none;" />
+      </div>
+      <div class="shh">
+        <input type="image" src="icon/search.png" onclick="go_search()" style="width:30px;height:30px;border:0px;outline: none;" />
+      </div>
+    </div>
+    <div class="question">
+      <img src="icon/question.png" id="tutorials" onclick="tutorials()">
+    </div>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <img src="tutoImg/OMain.png">
+      </div>
+    </div>
+    <hr>
+    <div class="cbp-spmenu-push">
+      <nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="Settings">
+        <h4>Settings</h4>
+        <li style="color:rgb(94, 94, 94);">Theme
+          <select class="form-control" id="theme">
+            <option id="blue">Blue</option>
+            <option id="green">Green</option>
+            <option id="pink">Pink</option>
+            <option id="red">Red</option>
+            <option id="purple">Purple</option>
+          </select>
+        </li>
+        <button type="button" id="Sbtn" onclick="settingSave()" class="btn btn-outline-secondary">저장
+      </nav>
+      <nav class="cbp-spmenu cbp-spmenu-vertical" id="TimeLine">
+        <h4>TimeLine</h4>
+        <h5 id="Today" class="list"></h5>
+      </nav>
+
+    </div>
+    <div id="map">
+    </div>
+    <div class="set">
+      <img src="icon/settings.png" id="showSettings" style="cursor:pointer;">
+    </div>
+    <div class="f-nw">
+      <button type="button" id="Nbtn" class="btn btn-outline-secondary" onclick="fn_check()">New
+    </div>
+
+  </div>
+</body>
+<!-- Firebase setting-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-app.js"></script>
+<!-- TODO: Add SDKs for Firebase products that you want to use
+   https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-analytics.js">
+  firebase.analytics();
+</script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-auth.js"></script><!-- firebase.auth()함수 에러 잡아주는 코드-->
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-storage.js"></script>
+<script document.cookie="safeCookie1=foo; SameSite=Lax" ; document.cookie="safeCookie2=foo" ; document.cookie="crossCookie=bar; SameSite=None; Secure" ;></script>
+<script src="./js/fireinit.js"></script>
+<script src="./js/random.js"></script>
+<script src="./js/uploadImgPreview.js"></script>
+<!-- /Firebase setting-->
+
+<!-- datepicker -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script>
+  function settingSave() {
+    var option = $("#theme option:selected").val();
+    console.log(option);
+    switch (option) {
+      case "Blue":
+        $("#logo").attr("src", "icon/logoB.png");
+        $("#Nbtn").attr('class', 'btn btn-outline-primary');
+        $("#Sbtn").attr('class', 'btn btn-outline-primary');
+        break;
+      case "Green":
+        $("#logo").attr("src", "icon/logoG.png");
+        $("#Nbtn").attr('class', 'btn btn-outline-success');
+        $("#Sbtn").attr('class', 'btn btn-outline-success');
+        break;
+      case "Pink":
+        $("#logo").attr("src", "icon/logoPi.png");
+        $("#Nbtn").attr('class', 'btn btn-outline-secondary');
+        $("#Sbtn").attr('class', 'btn btn-outline-secondary');
+        break;
+      case "Red":
+        $("#logo").attr("src", "icon/logoR.png");
+        $("#Nbtn").attr('class', 'btn btn-outline-danger');
+        $("#Sbtn").attr('class', 'btn btn-outline-danger');
+        break;
+      case "Purple":
+        $("#logo").attr("src", "icon/logoPu.png");
+        $("#Nbtn").attr('class', 'btn btn-outline-secondary');
+        $("#Sbtn").attr('class', 'btn btn-outline-secondary');
+        break;
+    }
+  }
+</script>
+<script>
+  $(function() {
+    $("#datepicker").datepicker({
+      monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+      dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+      showAnim: "slideDown",
+      showOtherMonths: true,
+      selectOtherMonths: true,
+      changeMonth: true,
+      changeYear: true,
+      showMonthAfterYear: true,
+      dateFormat: "yy-mm-dd",
+      onSelect: function(date) {
+        go_keyword(date);
+      },
+    });
+
+  });
+</script>
+<!-- /datepicker -->
+<script>
+  var database = firebase.database();
+  var addrarray = [];
+  var auth, userInfo, diaryData, key, selectkey, cnt = 0,
+    searchurl;
+  var title, comment, url, VDate, addr, CDate, hash, tag = '',
+    postNo,
+    auth = firebase.auth();
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      //인증성공부
+      console.log("success");
+      console.log(user);
+      //메모리스트 출력
+      userInfo = user; //로그인이 성공을 하면 user의 정보 즉, uid등을 이용하기 위해 userInfo에 저장
+      console.log(userInfo.uid);
+      initMap();
+      get_diary_list();
+    } else {
+      //인증실패부
+      auth.signInWithPopup(authProvider);
+    }
+  });
+  Date.prototype.format = function(f) {
+    if (!this.valueOf()) return " ";
+    var weekKorName = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+    var weekKorShortName = ["일", "월", "화", "수", "목", "금", "토"];
+    var weekEngName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    var weekEngShortName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var d = this;
+    return f.replace(/(yyyy|yy|MM|dd|KS|KL|ES|EL|HH|hh|mm|ss|a\/p)/gi, function($1) {
+      switch ($1) {
+        case "yyyy":
+          return d.getFullYear(); // 년 (4자리)
+        case "yy":
+          return (d.getFullYear() % 1000).zf(2); // 년 (2자리)
+        case "MM":
+          return (d.getMonth() + 1).zf(2); // 월 (2자리)
+        case "dd":
+          return d.getDate().zf(2); // 일 (2자리)
+        case "KS":
+          return weekKorShortName[d.getDay()]; // 요일 (짧은 한글)
+        case "KL":
+          return weekKorName[d.getDay()]; // 요일 (긴 한글)
+        case "ES":
+          return weekEngShortName[d.getDay()]; // 요일 (짧은 영어)
+        case "EL":
+          return weekEngName[d.getDay()]; // 요일 (긴 영어)
+        case "HH":
+          return d.getHours().zf(2); // 시간 (24시간 기준, 2자리)
+        case "hh":
+          return ((h = d.getHours() % 12) ? h : 12).zf(2); // 시간 (12시간 기준, 2자리)
+        case "mm":
+          return d.getMinutes().zf(2); // 분 (2자리)
+        case "ss":
+          return d.getSeconds().zf(2); // 초 (2자리)
+        case "a/p":
+          return d.getHours() < 12 ? "오전" : "오후"; // 오전/오후 구분
+        default:
+          return $1;
+      }
+    });
+  };
+  String.prototype.string = function(len) {
+    var s = '',
+      i = 0;
+    while (i++ < len) {
+      s += this;
+    }
+    return s;
+  };
+  String.prototype.zf = function(len) {
+    return "0".string(len - this.length) + this;
+  };
+  Number.prototype.zf = function(len) {
+    return this.toString().zf(len);
+  };
+
+  var today = new Date(); // 시간 변수 계속 바뀜
+  function userSessionCheck() {
+    console.log(today.format('yyyy-MM-dd'));
+  }
+  $("#Today").append(today.format('yyyy-MM-dd'));
+  userSessionCheck();
+
+  function get_diary_list() {
+    console.log(userInfo.uid);
+    var diaryRef = database.ref("diary/" + userInfo.uid);
+
+    diaryRef.on('child_added', on_child_added);
+    diaryRef.on('child_changed', function(data) {
+      console.log(data.key); //어떤게 수정되었는지 찍고
+      console.log(data.val()); //어떻게 수정되었는지 띄움
+    });
+    // console.log(data);
+
+  }
+
+  function on_child_added(data) {
+
+    key = data.key;
+    diaryData = data.val();
+    VDate = diaryData.visitDate;
+    if (VDate === today.format('yyyy-MM-dd')) {
+      cnt = cnt + 1;
+      title = diaryData.title;
+      comment = diaryData.comment;
+      url = diaryData.photo;
+      hash = diaryData.hashTag;
+      addr = diaryData.address;
+      CDate = diaryData.createtime;
+      postNo = cnt;
+      addrarray[cnt] = addr;
+      console.log(title + comment + url + hash + addr + CDate + ' postNo : ' + postNo + addrarray[cnt]);
+      console.log(comment);
+      setMarkers(addr, postNo, key, title, url, comment, hash);
+      var html =
+        "<li id='" + key + "' onclick=\"fn_set_senter(this.id);\" class=\"key\" style=\"cursor:pointer;\">" +
+        "<h6 style=\"cursor:pointer; float:left; margin-right:4%; margin-top:2%; color:#495057; font-size:18px;\">" + postNo + "</h6>" +
+        "<span class=\"form-date\" id=\"title\">" + title.substr(0, 7) + "</span>" +
+        "<span><img src=\"icon/bin.png\" style=\"cursor:pointer; width:25px; height:25px; float:right; margin-left:1%;\" title=\"삭제\" onclick=\"data_delete('" + key + "');\"></span>" +
+        "<span><img src=\"icon/plus.png\" style=\"cursor:pointer; width:25px; height:25px; float:right;\"title=\"자세히보기\" onclick=\"data_read('" + key + "');\"></span>" +
+        "<br><br>" +
+        "<span class=\"form-date\" id=\"comment\" style=\"margin-left:9%;\">" + comment.substr(0, 12) + "</span>" +
+        "</li>";
+      $("#TimeLine").append(html);
+    }
+  }
+  setTimeout(function() {
+    console.log(postNo);
+  }, 2000);
+  // 만약 개시글이 하나도 없다면, 핀없이 경성대가 센터로, 개시글이 하나라도 잇다면 그 핀이 센터로
+  // var addr = "대한민국 부산광역시 남구 대연3동 수영로 경성대학교";
+
+  function setMarkers(addr, postNo, key, title, url, comment, hash) {
+    console.log(addr, postNo, key, url);
+    var address = addr;
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode({
+      'address': address
+    }, function(results, status) {
+      console.log('results', results);
+      console.log(results[0].geometry.location.lat(), results[0].geometry.location.lng());
+      if (status == google.maps.GeocoderStatus.OK) {
+        // map.setCenter(results[0].geometry.location);
+        marker = new google.maps.Marker({
+          map: map,
+          // icon: image, // 마커로 사용할 이미지(변수)
+          title: "PostNo : " + postNo, // 마커에 마우스 포인트를 갖다댔을 때 뜨는 타이틀
+          position: results[0].geometry.location,
+          id: key
+        });
+        var content = hash + "<div id='thumbnailImgs'> " +
+          "<img style=\"width:200px; height:auto;\" src='" + url + "'>" + "</div>"; // 말풍선 안에 들어갈 내용
+
+        // 마커를 클릭했을 때의 이벤트. 말풍선 뿅~
+        var infowindow = new google.maps.InfoWindow({
+          content: content
+        });
+        google.maps.event.addListener(marker, 'click', (function(marker, addr) {
+          return function() {
+            map.setZoom(15.5);
+            map.setCenter(marker.getPosition());
+            infowindow.open(map, marker);
+          }
+        })(marker, i))
+      } else {
+        alert("Geocode was not successful for the following reason: " + status);
+      }
+    });
+  }
+  var map;
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: {
+        lat: 35.139761,
+        lng: 129.098491
+      },
+      zoom: 15.5
+    });
+  }
+
+  function fn_set_senter(key) {
+    var diaryRef = database.ref('diary/' + userInfo.uid + '/' + key)
+      .once('value').then(function(snapshot) {
+        var diary = snapshot.val();
+        var setaddr = diary.address;
+        var address = setaddr;
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({
+          'address': address
+        }, function(results, status) {
+          if (status == google.maps.GeocoderStatus.OK) {
+            map.setCenter(results[0].geometry.location);
+            map.setZoom(17);
+            console.log(setaddr);
+            var address = ''; //클리어를 안해주면 변수안에 주소가 남아있기때문에 새로운 주소가 담기기전 작동을해버림
+          } else {
+            alert("Geocode was not successful for the following reason: " + status);
+          }
+        });
+      });
+  }
+
+  function data_delete(key) {
+    selectkey = key;
+    console.log(key);
+    Swal.fire({
+      position: 'top',
+      icon: 'question',
+      title: '삭제하시겠습니까?',
+      showCancelButton: true,
+      cancelButtonColor: '#d33',
+    }).then((href) => {
+      if (href.value) {
+        var diaryRef = database.ref('diary/' + userInfo.uid + '/' + key);
+        diaryRef.remove();
+        window.location.href = "Main.html";
+      } else {
+        return;
+      }
+    });
+  }
+
+  function data_read(key) {
+    var readkey = key;
+    Swal.fire({
+      position: 'top',
+      icon: 'question',
+      title: '자세히 읽을 수 있는 페이지로 이동합니다. \n 이동하시겠습니까?',
+      showCancelButton: true,
+      cancelButtonColor: '#d33',
+    }).then((href) => {
+      if (href.value) {
+        window.location.href = "RD.html?key=" + readkey;
+      } else {
+        return;
+      }
+    });
+  }
+</script>
+<script>
+  function plushash() { //해쉬테그칸에 공백금지 함수
+
+    var chk2 = $("#hash").is(":checked");
+    if (chk2) {
+      $("#input").focus();
+      $("#input").val("#");
+      $(document).on('keyup', "#input", function() {
+        var a = $("#input").val().replace(/ /gi, '');
+        $("#input").val(a);
+      });
+    } else {
+      location.reload();
+      $("#input").val("");
+    }
+  }
+  String.prototype.replaceAll = function(org, dest) {
+    return this.split(org).join(dest);
+  }
+
+  function go_search() {
+    var searchword = $("#input").val();
+
+    if (searchword === '') {
+      swal.fire({
+        icon: 'error',
+        title: '검색어를 입력해 주세요.',
+        position: 'top',
+      })
+      return;
+    } else if (searchword === '#') {
+      swal.fire({
+        icon: 'error',
+        title: '해쉬태그를 입력해 주세요.',
+        position: 'top',
+      })
+      return;
+    } else {
+      if (searchword[0] === '#') {
+        temp = searchword.split('#');
+        if (temp.length < 3) {
+          history.go(0);
+          console.log(searchword);
+          searchword = searchword.replaceAll("#", "*");
+          searchurl = "Search.html?searchword=" + searchword;
+          var enc = encodeURI(searchurl);
+          window.location.href = enc;
+        } else {
+          swal.fire({
+            position: 'top',
+            icon: 'warning',
+            title: '해쉬태그는 최대 1개까지 \n검색어로 지정할 수 있습니다.',
+          });
+        }
+      } else {
+        history.go(0);
+        console.log(searchword);
+        searchword = searchword.replaceAll("#", "*");
+        searchurl = "Search.html?searchword=" + searchword;
+        var enc = encodeURI(searchurl);
+        window.location.href = enc;
+      }
+
+    }
+  }
+
+  function go_keyword(keyword) {
+    $("#input").val(keyword);
+    console.log(keyword);
+  }
+</script>
+<script src="js/classie.js"></script>
+<script>
+  var menuLeft = document.getElementById('Settings'),
+    showSettings = document.getElementById('showSettings'),
+    body = document.body;
+
+  showSettings.onclick = function() {
+    classie.toggle(this, 'active');
+    classie.toggle(menuLeft, 'cbp-spmenu-open');
+    disableOther('showSettings');
+  };
+
+  function disableOther(button) {
+    if (button !== 'showSettings') {
+      classie.toggle(showSettings, 'disabled');
+    }
+  }
+
+  function fn_check() {
+    if (postNo >= 4) {
+      Swal.fire({
+        position: 'top',
+        icon: 'warning',
+        title: "현재 이용중인 요금제에서는 하루 최대 \n4개의 일기만 작성할 수 있습니다.",
+      });
+    } else {
+      location.href = 'Create.html';
+    }
+  }
+</script>
+<script>
+  function tutorials() {
+    var modal = document.getElementById('myModal');
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("tutorials");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on the button, open the modal
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  };
+</script>
+<!--부트스트랩 src -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA32MglYzQs7W6f88lVgpGJwxfvLCTs-GQ"></script>
+
+</html>

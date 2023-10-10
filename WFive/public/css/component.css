@@ -1,0 +1,58 @@
+/* General styles for all menus */
+.cbp-spmenu {
+	background: #d7d6d6;
+	position: fixed;
+}
+
+.cbp-spmenu h4 {
+	color: #000000;
+	text-align: center;
+	font-size: 1.7em;
+	padding: 20px;
+	margin: 0;
+	font-weight: 300;
+	background: #cdcdcd;
+}
+.cbp-spmenu h5 {
+	color: #000000;
+	text-align: center;
+	font-size: 1em;
+	padding: 10px;
+	margin: 0;
+	font-weight: 300;
+	background: #cdcdcd;
+	margin-top:-4%;
+}
+
+.cbp-spmenu li {
+	height: 18%;
+	display: block;
+	color: #fff;
+	padding: 0.7em;
+}
+
+.cbp-spmenu-vertical {
+	width: 240px;
+	height: 71.5%;
+	top: calc(100% - 85%);
+	z-index: 1000;
+}
+
+.cbp-spmenu-vertical div {
+	width: auto;
+}
+
+.cbp-spmenu-left.cbp-spmenu-open {
+	z-index: 5000;
+}
+
+nav button{
+  margin-top: 15%;
+  margin-right: 7%;
+  float: right;
+}
+
+nav hr{
+    margin-top:15%;
+  	border-bottom: 1px solid #a0a1a2;
+}
